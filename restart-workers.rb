@@ -23,7 +23,7 @@ aws_access_key_id = ENV['AWS_ACCESS_KEY_ID']
 aws_secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
 aws_region = ENV['EC2_REGION']
 
-log = Logger.new("restart-workers.log", shift_age = 7, shift_size = 1048576)
+log = Logger.new("/home/ubuntu/apps/restart-workers/logs/restart-workers.log", shift_age = 7, shift_size = 1048576)
 
 begin  
 
@@ -37,7 +37,7 @@ begin
  
   stopped_workers = c.servers.select { |s| s.state=='stopped' }
 
-  log.info  "found #{stopped_workers.size} stopped_workers"
+  log.info "found #{stopped_workers.size} stopped_workers"
   stopped_workers.each do |w|  
     log.info "starting worker #{w.to_s}"
     w.start 
