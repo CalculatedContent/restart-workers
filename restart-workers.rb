@@ -19,37 +19,33 @@ require 'fog'
 require 'socket'
 require 'logger'
 
-aws_access_key_id = ENV['AWS_ACCESS_KEY_ID']
-aws_secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
-aws_region = ENV['EC2_REGION']
+log = nil
+begin
 
-log = Logger.new("/home/ubuntu/apps/restart-workers/logs/restart-workers.log", shift_age = 7, shift_size = 1048576)
+  aws_access_key_id = ENV['AWS_ACCESS_KEY_ID']
+  aws_secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
+  aws_region = ENV['EC2_REGION']
 
-begin  
+  log = Logger.new("/home/ubuntu/apps/restart-workers/logs/restart-workers.log", shift_age = 7, shift_size = 1048576)
 
   c = Fog::Compute.new(
   :provider => 'AWS',
-  :aws_secret_access_key => aws_secret_access_key,
   :aws_access_key_id => aws_access_key_id,
+  :aws_secret_access_key => aws_secret_access_key,
   :region => aws_region )
 
   raise 'can not connect' if c.nil?
- 
+
   stopped_workers = c.servers.select { |s| s.state=='stopped' }
 
   log.info "found #{stopped_workers.size} stopped_workers"
-  stopped_workers.each do |w|  
+  stopped_workers.each do |w|
     log.info "starting worker #{w.to_s}"
-    w.start 
+    w.start
   end
 
-rescue  Exception => e  
+rescue  Exception => e
   log.warn e.message
-  log.warn e.backtrace.inspect   
+  log.warn e.backtrace.inspect
 end
-
-
-
-
-
 
